@@ -1,38 +1,42 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Button } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import {
   InitialConfigType,
   LexicalComposer,
 } from '@lexical/react/LexicalComposer';
-import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { $getRoot, $getSelection, EditorState } from 'lexical';
-import { MyCustomAutoFocusPlugin } from '@/components/MyCustomAutoFocusPlugin';
+import { EditorState } from 'lexical';
+import { MyCustomAutoFocusPlugin } from '../components/MyCustomAutoFocusPlugin';
+import { useRef } from 'react';
+
+const initialConfig: InitialConfigType = {
+  namespace: 'MyEditor',
+  onError(error: Error) {
+    console.log(error);
+  },
+};
 
 const LexicalPage: NextPage = () => {
-  const initialConfig: InitialConfigType = {
-    namespace: 'MyEditor',
-    onError(error: Error) {
-      console.log(error);
-    },
-  };
+  const editorStateRef = useRef<EditorState | null>(null);
 
   const onChange = (editorState: EditorState) => {
-    editorState.read(() => {
-      const root = $getRoot();
-      const selection = $getSelection();
+    editorStateRef.current = editorState;
+  };
 
-      console.log(root, selection);
-    });
+  const onClick = () => {
+    if (editorStateRef.current) {
+      console.log(JSON.stringify(editorStateRef.current));
+    }
   };
 
   return (
     <Box px={4} py={4}>
       <LexicalComposer initialConfig={initialConfig}>
-        <PlainTextPlugin
+        <RichTextPlugin
           contentEditable={<ContentEditable />}
           placeholder={<div>Enter some text...</div>}
           ErrorBoundary={LexicalErrorBoundary}
@@ -41,6 +45,9 @@ const LexicalPage: NextPage = () => {
         <HistoryPlugin />
         <MyCustomAutoFocusPlugin />
       </LexicalComposer>
+      <Button mt={6} onClick={onClick}>
+        check
+      </Button>
     </Box>
   );
 };
