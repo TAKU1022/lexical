@@ -9,7 +9,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { EditorState } from 'lexical';
+import { EditorState, LexicalEditor } from 'lexical';
 import { MyCustomAutoFocusPlugin } from '../components/MyCustomAutoFocusPlugin';
 import { useRef } from 'react';
 
@@ -21,15 +21,16 @@ const initialConfig: InitialConfigType = {
 };
 
 const LexicalPage: NextPage = () => {
-  const editorStateRef = useRef<EditorState | null>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
 
-  const onChange = (editorState: EditorState) => {
-    editorStateRef.current = editorState;
+  const onChange = (_: EditorState, editor: LexicalEditor) => {
+    editorRef.current = editor;
   };
 
   const onClick = () => {
-    if (editorStateRef.current) {
-      console.log(JSON.stringify(editorStateRef.current));
+    if (editorRef.current) {
+      const editorState = editorRef.current.getEditorState();
+      console.log(editorState.toJSON());
     }
   };
 
